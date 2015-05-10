@@ -9,6 +9,11 @@
 #define LEFT_BREAK 8
 #define LEFT_POWER 11
 
+#define RIGHT_FORWARD 12
+#define RIGHT_BACKWARD 11
+#define LEFT_FORWARD 10
+#define LEFT_BACKWARD 9
+
 // SRF05 PIN
 #define ECHOPIN 7 // GREEN
 #define TRIGPIN 6 // BLUE
@@ -22,19 +27,23 @@
 #define BACKWARD 2
 #define ROTATE_RIGHT 3
 #define ROTATE_LEFT 4
-int mode = WAITING;
+int mode = FORWARD;
 
 void setup() {
   Serial.begin(9600); 
   Serial.println("Starting...");
 
   // Motor shield
-  pinMode(LEFT_DIRECTION, OUTPUT);
+  /*pinMode(LEFT_DIRECTION, OUTPUT);
   pinMode(LEFT_BREAK, OUTPUT);
   digitalWrite(LEFT_BREAK, HIGH);
   pinMode(RIGHT_DIRECTION, OUTPUT);
   pinMode(RIGHT_BREAK, OUTPUT);
-  digitalWrite(RIGHT_BREAK, HIGH);
+  digitalWrite(RIGHT_BREAK, HIGH);*/
+  pinMode(RIGHT_FORWARD, OUTPUT);
+  pinMode(RIGHT_BACKWARD, OUTPUT);
+  pinMode(LEFT_FORWARD, OUTPUT);
+  pinMode(LEFT_BACKWARD, OUTPUT);
   
   // SRF05
   pinMode(ECHOPIN, INPUT);
@@ -66,7 +75,7 @@ void motor(int power) {
   motor(power, power);
 }
 
-void motor(int l, int r) {
+/*void motor(int l, int r) {
   // Motor set
   if( r!=0) {
     digitalWrite(RIGHT_DIRECTION, r>0 ? HIGH: LOW);
@@ -87,13 +96,20 @@ void motor(int l, int r) {
     digitalWrite(LEFT_BREAK, HIGH);
     analogWrite(LEFT_POWER, 0);
   }
+}*/
+void motor(int l, int r) {
+  // Motor set
+  digitalWrite(RIGHT_FORWARD, r>0 ? HIGH:LOW);
+  digitalWrite(RIGHT_BACKWARD, r<=0 ? HIGH:LOW);
+     
+  digitalWrite(LEFT_FORWARD, l>0 ? HIGH:LOW);
+  digitalWrite(LEFT_BACKWARD, l<=0 ? HIGH:LOW);
 }
-
 
 void loop() {
   
   // Button -> Change mode
-  if( digitalRead(CMD_PIN)==HIGH ) {
+  /*if( digitalRead(CMD_PIN)==HIGH ) {
     while ( digitalRead(CMD_PIN)==HIGH ) {
       delay(200);
     }
@@ -102,7 +118,7 @@ void loop() {
     } else {
       mode = WAITING;
     }
-  }
+  }*/
   
   int d = getDistance(); // wall proximity
   
@@ -151,7 +167,7 @@ void loop() {
   Serial.print("\tD: ");
   Serial.print( d );
   Serial.print("\tM: ");
-  Serial.print( mode );
+  Serial.println( mode );
   
   delay(100);
 }
